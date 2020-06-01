@@ -17,5 +17,5 @@ public :
     std::vector<sentence>::iterator giveBest(void);
     void naturalSelection(void);
     void replaceNextGen(void);
-    std::string giveBestPerformer(void);
+    bool giveBestPerformer(void);
 };

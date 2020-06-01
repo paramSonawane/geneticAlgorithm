@@ -7,7 +7,7 @@ sentence::sentence(std::string* target){
 }
 
 char sentence::giveRandomChar(void){
-    static const char validLetters[]=" .,!ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    static const char validLetters[]=" .!ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     int totalLetters = sizeof(validLetters) - 1;
 
     unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
@@ -38,10 +38,10 @@ void sentence::printLine(void){
 std::string sentence::crossover(std::string* partner, float mutationRate){
     std::string child;
 
-    int midpoint = line.length()/2;
+    // unsigned int midpoint = line.length()/2;
 
-    for(int i = 0; i < line.length(); i++)
-        child.push_back( (midpoint < i ? line[i] : (*partner)[i]) );
+    for(unsigned int i = 0; i < line.length(); i++)
+        child.push_back( (i%2 == 0 ? line[i] : (*partner)[i]) );
 
     mutate(&child, mutationRate);
     return child;
@@ -52,8 +52,7 @@ void sentence::mutate(std::string* child, float mutationRate){
     std::default_random_engine randEng(seed);
     std::uniform_real_distribution<double> giveRandom(0, 1);
 
-    for(int i = 0; i < (*child).length(); i++){
+    for(unsigned int i = 0; i < (*child).length(); i++)
         if(giveRandom(randEng) < mutationRate)
             (*child)[i] = giveRandomChar();
-    }
 }

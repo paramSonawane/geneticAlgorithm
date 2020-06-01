@@ -31,22 +31,34 @@ void generation::naturalSelection(void){
 
     for(std::vector<sentence>::iterator it = population.begin(); it != population.end(); it++){
         int normFitness = ( (*it).fitness / maxFit) * 100;
-        // std::cout << std::endl << "normFitness : " << normFitness;
         for(int i = 0; i < normFitness; selectedParents.push_back(*it), i++);
     }
 }
 
 void generation::replaceNextGen(void){
-    std::cout << "The populations is : " << population.size() << std::endl;
-
     for(std::vector<sentence>::iterator it = population.begin(); it != population.end(); it++){
-        std::cout << (*it).line << std::endl;
-
         unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
         std::default_random_engine randEng(seed);
-        std::uniform_int_distribution<int> giveRandom(0, selectedParents.size());
+        std::uniform_int_distribution<int> giveRandom(0, selectedParents.size() - 1);
 
         int parentA = giveRandom(randEng), parentB = giveRandom(randEng);
         (*it).line = selectedParents.at(parentA).crossover( &(selectedParents.at(parentB).line), mutationRate);
+        (*it).calcFitness(&target);
     }
+}
+
+bool generation::giveBestPerformer(void){
+    float maxFit = 0.0;
+    std::vector<sentence>::iterator maxIt;
+
+    for(std::vector<sentence>::iterator it1 = population.begin(); it1 != population.end();  it1++)
+        if(maxFit < (*it1).fitness){
+            maxFit = (*it1).fitness;
+            maxIt = it1;
+        }
+
+    std::cout << std::endl << std::endl << "The Best performer was  : \"" << (*maxIt).line << "\" with Fitness of : "
+              << std::setprecision(6) << std::fixed << (*maxIt).fitness;
+
+    return ((*maxIt).fitness == 1) ? true : false;
 }
