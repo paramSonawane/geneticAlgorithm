@@ -8,7 +8,7 @@ CXXFLAGS = -std=c++11 -Wall -g
 LDFLAGS =
 
 # Makefile settings - Can be customized.
-APPNAME = myapp
+APPNAME = genAlgo
 EXT = .cpp
 SRCDIR = src
 OBJDIR = obj

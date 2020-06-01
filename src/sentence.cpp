@@ -1,8 +1,4 @@
 #include "include/sentence.h"
-#ifndef iomanip
-#include <iomanip>
-#endif
-
 
 sentence::sentence(std::string* target){
     generateString( (*target).length() );
@@ -10,16 +6,19 @@ sentence::sentence(std::string* target){
     // printLine();
 }
 
-void sentence::generateString(int len){
-    static int lineNo = 1;
+char sentence::giveRandomChar(void){
     static const char validLetters[]=" .,!ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     int totalLetters = sizeof(validLetters) - 1;
 
-    srand( (unsigned)time(NULL) + lineNo );
-    for(int i = 0; i < len; i++)
-        line.push_back(validLetters[rand()%totalLetters]);
+    unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
+    std::default_random_engine randEng(seed);
+    std::uniform_int_distribution<int> giveRandom(0, totalLetters);
 
-    lineNo++;
+    return validLetters[giveRandom(randEng)];
+}
+
+void sentence::generateString(int len){
+    for(int i = 0; i < len; line.push_back(giveRandomChar()), i++);
 }
 
 float sentence::calcFitness(std::string* target){
@@ -34,4 +33,27 @@ float sentence::calcFitness(std::string* target){
 
 void sentence::printLine(void){
     std::cout << line << " : " << std::fixed << std::setprecision(10) << fitness << std::endl;
+}
+
+std::string sentence::crossover(std::string* partner, float mutationRate){
+    std::string child;
+
+    int midpoint = line.length()/2;
+
+    for(int i = 0; i < line.length(); i++)
+        child.push_back( (midpoint < i ? line[i] : (*partner)[i]) );
+
+    mutate(&child, mutationRate);
+    return child;
+}
+
+void sentence::mutate(std::string* child, float mutationRate){
+    unsigned seed = std::chrono::steady_clock::now().time_since_epoch().count();
+    std::default_random_engine randEng(seed);
+    std::uniform_real_distribution<double> giveRandom(0, 1);
+
+    for(int i = 0; i < (*child).length(); i++){
+        if(giveRandom(randEng) < mutationRate)
+            (*child)[i] = giveRandomChar();
+    }
 }
